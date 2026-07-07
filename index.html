@@ -10,14 +10,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#f6f1e7;
-  --paper-deep:#efe7d7;
-  --ink:#221e18;
-  --ink-soft:#5c554a;
-  --rust:#b5431c;
-  --rust-soft:#d97a52;
-  --moss:#3e6b50;
-  --hairline:#d8cdb8;
+  --paper:#f2f3ee;
+  --paper-deep:#e7e9df;
+  --ink:#13141c;
+  --ink-soft:#565a66;
+  --accent:#2429dd;
+  --accent-soft:#8f93ff;
+  --spot:#c81e64;
+  --hairline:#ccd0da;
   --measure:66ch;
   --serif:"Newsreader",Georgia,serif;
   --display:"Fraunces",Georgia,serif;
@@ -44,20 +44,20 @@ body::before{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 /* reading progress — CSS scroll-driven, no JS */
-.progress{position:fixed;top:0;left:0;height:4px;width:100%;background:var(--rust);transform-origin:0 50%;transform:scaleX(0);z-index:50}
+.progress{position:fixed;top:0;left:0;height:4px;width:100%;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);z-index:50}
 @supports (animation-timeline:scroll()){
   .progress{animation:grow linear both;animation-timeline:scroll(root)}
   @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 }
-a{color:var(--rust);text-decoration-color:color-mix(in srgb,var(--rust) 40%,transparent);text-underline-offset:3px}
-a:hover{text-decoration-color:var(--rust)}
-a:focus-visible{outline:2px solid var(--rust);outline-offset:3px;border-radius:2px}
+a{color:var(--accent);text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
 .wrap{max-width:78rem;margin:0 auto;padding:0 1.4rem}
 .col{max-width:var(--measure);margin:0 auto}
 
 /* ---------- masthead ---------- */
 header.masthead{padding:5.5rem 0 3.5rem;border-bottom:3px double var(--ink)}
-.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rust);display:flex;gap:1.2rem;align-items:baseline;flex-wrap:wrap}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);display:flex;gap:1.2rem;align-items:baseline;flex-wrap:wrap}
 .eyebrow .rule{flex:1;border-top:1px solid var(--hairline);transform:translateY(-4px)}
 h1{
   font-family:var(--display);
@@ -68,29 +68,29 @@ h1{
   margin:1.6rem 0 1.4rem;
   font-variation-settings:"opsz" 144;
 }
-h1 em{font-style:italic;color:var(--rust)}
+h1 em{font-style:italic;color:var(--accent)}
 .dek{font-size:clamp(1.15rem,2.2vw,1.45rem);font-style:italic;color:var(--ink-soft);max-width:44ch;line-height:1.5}
 .byline{margin-top:2.2rem;font-family:var(--mono);font-size:.82rem;color:var(--ink-soft);display:flex;gap:.6em;flex-wrap:wrap;align-items:center}
 .byline b{color:var(--ink);font-weight:500}
-.byline .dot{color:var(--rust)}
+.byline .dot{color:var(--accent)}
 
 /* ---------- toc ---------- */
 nav.toc{border-bottom:1px solid var(--hairline);padding:1.8rem 0}
 nav.toc ol{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.55rem 2.4rem;counter-reset:toc}
 nav.toc a{display:flex;gap:.9em;align-items:baseline;text-decoration:none;color:var(--ink);font-size:1.02rem;padding:.15rem 0}
-nav.toc a::before{counter-increment:toc;content:counter(toc,decimal-leading-zero);font-family:var(--mono);font-size:.75rem;color:var(--rust)}
-nav.toc a:hover{color:var(--rust)}
+nav.toc a::before{counter-increment:toc;content:counter(toc,decimal-leading-zero);font-family:var(--mono);font-size:.75rem;color:var(--accent)}
+nav.toc a:hover{color:var(--accent)}
 
 /* ---------- sections ---------- */
 main{padding-bottom:2rem}
 section{padding:4.2rem 0 1.2rem;scroll-margin-top:2.5rem}
 .kicker{display:flex;align-items:baseline;gap:1.1rem;margin-bottom:2.1rem}
-.kicker .num{font-family:var(--display);font-weight:300;font-style:italic;font-size:3.4rem;line-height:1;color:var(--rust-soft)}
+.kicker .num{font-family:var(--display);font-weight:300;font-style:italic;font-size:3.4rem;line-height:1;color:var(--accent-soft)}
 .kicker h2{font-family:var(--display);font-weight:600;font-size:clamp(1.65rem,3.4vw,2.35rem);line-height:1.12;letter-spacing:-.01em}
 p{margin-bottom:1.35rem}
 p.open::first-letter{
   font-family:var(--display);font-weight:600;font-size:4.6rem;float:left;
-  line-height:.78;padding:.09em .12em 0 0;color:var(--rust);
+  line-height:.78;padding:.09em .12em 0 0;color:var(--accent);
 }
 strong{font-weight:600}
 h3{font-family:var(--display);font-size:1.32rem;font-weight:600;margin:2.4rem 0 .9rem}
@@ -100,11 +100,11 @@ ul.loose li,ol.loose li{margin-bottom:.55rem;padding-left:.3rem}
 
 /* margin notes */
 .noted{display:grid;grid-template-columns:minmax(0,var(--measure)) minmax(11rem,15rem);gap:2.6rem;justify-content:center}
-.note{font-family:var(--mono);font-size:.76rem;line-height:1.55;color:var(--ink-soft);border-top:2px solid var(--rust);padding-top:.55rem;height:fit-content;position:sticky;top:5rem}
-.note b{color:var(--rust);font-weight:500}
+.note{font-family:var(--mono);font-size:.76rem;line-height:1.55;color:var(--ink-soft);border-top:2px solid var(--accent);padding-top:.55rem;height:fit-content;position:sticky;top:5rem}
+.note b{color:var(--accent);font-weight:500}
 @media (max-width:64rem){
   .noted{display:block}
-  .note{position:static;margin:0 auto 1.6rem;max-width:var(--measure);border:1px solid var(--hairline);border-top:2px solid var(--rust);padding:.7rem .9rem;background:var(--paper-deep)}
+  .note{position:static;margin:0 auto 1.6rem;max-width:var(--measure);border:1px solid var(--hairline);border-top:2px solid var(--accent);padding:.7rem .9rem;background:var(--paper-deep)}
 }
 
 /* insight callout — the eye-opener boxes */
@@ -117,9 +117,9 @@ ul.loose li,ol.loose li{margin-bottom:.55rem;padding-left:.3rem}
 .insight::before{
   content:"THE SHIFT";position:absolute;top:-.62rem;left:1.4rem;
   font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;
-  background:var(--rust);color:var(--paper);padding:.2em .7em;border-radius:2px;
+  background:var(--accent);color:var(--paper);padding:.2em .7em;border-radius:2px;
 }
-.insight em{color:var(--rust-soft);font-style:italic}
+.insight em{color:var(--accent-soft);font-style:italic}
 
 /* pull quote */
 blockquote.pull{
@@ -127,14 +127,14 @@ blockquote.pull{
   font-family:var(--display);font-style:italic;font-weight:480;
   font-size:clamp(1.45rem,3vw,1.95rem);line-height:1.35;color:var(--ink);
 }
-blockquote.pull::before{content:"";display:block;width:3.2rem;height:3px;background:var(--rust);margin:0 auto 1.5rem}
+blockquote.pull::before{content:"";display:block;width:3.2rem;height:3px;background:var(--accent);margin:0 auto 1.5rem}
 blockquote.pull cite{display:block;margin-top:1.2rem;font-family:var(--mono);font-style:normal;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
 
 /* practice cards */
 .practice{border-top:1px solid var(--hairline);padding:1.7rem 0 .4rem;}
 .practice:last-of-type{border-bottom:1px solid var(--hairline);margin-bottom:2rem;padding-bottom:1.4rem}
 .practice h3{margin:0 0 .7rem;display:flex;gap:.85em;align-items:baseline}
-.practice h3 .pn{font-family:var(--mono);font-weight:400;font-size:.8rem;color:var(--rust)}
+.practice h3 .pn{font-family:var(--mono);font-weight:400;font-size:.8rem;color:var(--accent)}
 .practice .src{font-family:var(--mono);font-size:.74rem;color:var(--ink-soft);margin-bottom:.4rem}
 
 /* myths ledger */
@@ -148,7 +148,7 @@ blockquote.pull cite{display:block;margin-top:1.2rem;font-family:var(--mono);fon
 figure{margin:3rem auto;max-width:52rem}
 figure svg{width:100%;height:auto;display:block}
 figcaption{font-family:var(--mono);font-size:.76rem;color:var(--ink-soft);text-align:center;margin-top:1rem;letter-spacing:.02em}
-figcaption b{color:var(--rust);font-weight:500}
+figcaption b{color:var(--accent);font-weight:500}
 .fig-frame{background:var(--paper-deep);border:1px solid var(--hairline);border-radius:6px;padding:clamp(.8rem,2.5vw,2rem)}
 
 /* checklist */
@@ -157,18 +157,18 @@ figcaption b{color:var(--rust);font-weight:500}
 .check li:last-child{border-bottom:1px solid var(--hairline)}
 .check li::before{
   counter-increment:chk;content:counter(chk,decimal-leading-zero);
-  position:absolute;left:.2rem;top:.95rem;font-family:var(--mono);font-size:.78rem;color:var(--rust);
+  position:absolute;left:.2rem;top:.95rem;font-family:var(--mono);font-size:.78rem;color:var(--accent);
 }
 
 /* sources */
 .sources ol{margin-left:1.6rem}
 .sources li{margin-bottom:.7rem;font-size:1rem}
-.sources li::marker{font-family:var(--mono);font-size:.8rem;color:var(--rust)}
+.sources li::marker{font-family:var(--mono);font-size:.8rem;color:var(--accent)}
 sup a{font-family:var(--mono);font-size:.68em;text-decoration:none;padding:0 .1em}
 
 /* footer */
 footer{border-top:3px double var(--ink);margin-top:4rem;padding:2.4rem 0 4rem;font-family:var(--mono);font-size:.8rem;color:var(--ink-soft);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-footer a{color:var(--rust)}
+footer a{color:var(--accent)}
 
 /* svg shared text styles */
 svg text{font-family:"IBM Plex Mono",monospace}
@@ -234,35 +234,35 @@ svg text{font-family:"IBM Plex Mono",monospace}
     <div class="fig-frame">
     <svg viewBox="0 0 860 240" role="img" aria-labelledby="fig1t">
       <title id="fig1t">The three properties of Agent Experience: accessibility, comprehension, operability</title>
-      <g font-size="13" fill="#221e18">
+      <g font-size="13" fill="#13141c">
         <!-- card 1 -->
-        <rect x="10" y="30" width="260" height="170" rx="8" fill="#f6f1e7" stroke="#d8cdb8"/>
-        <text x="30" y="66" font-size="15" font-weight="600" fill="#b5431c">ACCESSIBILITY</text>
+        <rect x="10" y="30" width="260" height="170" rx="8" fill="#f2f3ee" stroke="#ccd0da"/>
+        <text x="30" y="66" font-size="15" font-weight="600" fill="#2429dd">ACCESSIBILITY</text>
         <text x="30" y="98">Can the agent reach</text>
         <text x="30" y="118">what it needs?</text>
-        <text x="30" y="156" font-size="11" fill="#5c554a">paths · APIs · commands</text>
-        <text x="30" y="174" font-size="11" fill="#5c554a">docs it can actually open</text>
+        <text x="30" y="156" font-size="11" fill="#565a66">paths · APIs · commands</text>
+        <text x="30" y="174" font-size="11" fill="#565a66">docs it can actually open</text>
         <!-- arrow -->
-        <path d="M278 115 h24" stroke="#b5431c" stroke-width="2" marker-end="url(#arr)"/>
+        <path d="M278 115 h24" stroke="#2429dd" stroke-width="2" marker-end="url(#arr)"/>
         <!-- card 2 -->
-        <rect x="310" y="30" width="260" height="170" rx="8" fill="#f6f1e7" stroke="#d8cdb8"/>
-        <text x="330" y="66" font-size="15" font-weight="600" fill="#b5431c">COMPREHENSION</text>
+        <rect x="310" y="30" width="260" height="170" rx="8" fill="#f2f3ee" stroke="#ccd0da"/>
+        <text x="330" y="66" font-size="15" font-weight="600" fill="#2429dd">COMPREHENSION</text>
         <text x="330" y="98">Can it understand</text>
         <text x="330" y="118">what it found?</text>
-        <text x="330" y="156" font-size="11" fill="#5c554a">conventions stated once</text>
-        <text x="330" y="174" font-size="11" fill="#5c554a">names that mean things</text>
-        <path d="M578 115 h24" stroke="#b5431c" stroke-width="2" marker-end="url(#arr)"/>
+        <text x="330" y="156" font-size="11" fill="#565a66">conventions stated once</text>
+        <text x="330" y="174" font-size="11" fill="#565a66">names that mean things</text>
+        <path d="M578 115 h24" stroke="#2429dd" stroke-width="2" marker-end="url(#arr)"/>
         <!-- card 3 -->
-        <rect x="610" y="30" width="240" height="170" rx="8" fill="#f6f1e7" stroke="#d8cdb8"/>
-        <text x="630" y="66" font-size="15" font-weight="600" fill="#b5431c">OPERABILITY</text>
+        <rect x="610" y="30" width="240" height="170" rx="8" fill="#f2f3ee" stroke="#ccd0da"/>
+        <text x="630" y="66" font-size="15" font-weight="600" fill="#2429dd">OPERABILITY</text>
         <text x="630" y="98">Can it act on it,</text>
         <text x="630" y="118">toward your goal?</text>
-        <text x="630" y="156" font-size="11" fill="#5c554a">runnable verification</text>
-        <text x="630" y="174" font-size="11" fill="#5c554a">clear autonomy limits</text>
+        <text x="630" y="156" font-size="11" fill="#565a66">runnable verification</text>
+        <text x="630" y="174" font-size="11" fill="#565a66">clear autonomy limits</text>
       </g>
       <defs>
         <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M0 0 L10 5 L0 10 z" fill="#b5431c"/>
+          <path d="M0 0 L10 5 L0 10 z" fill="#2429dd"/>
         </marker>
       </defs>
     </svg>
@@ -345,40 +345,40 @@ svg text{font-family:"IBM Plex Mono",monospace}
         <title id="fig2t">Layered context loading: a small always-on core, per-repo files, and skills that load on demand</title>
         <defs>
           <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0 0 L10 5 L0 10 z" fill="#3e6b50"/>
+            <path d="M0 0 L10 5 L0 10 z" fill="#c81e64"/>
           </marker>
         </defs>
         <g font-size="13">
           <!-- always-on -->
-          <rect x="20" y="26" width="330" height="70" rx="8" fill="#b5431c"/>
-          <text x="40" y="56" fill="#f6f1e7" font-weight="600">~/.claude/  core workflow.md</text>
-          <text x="40" y="78" fill="#f6f1e7" font-size="11">≈ 55 lines · loads EVERY session</text>
+          <rect x="20" y="26" width="330" height="70" rx="8" fill="#2429dd"/>
+          <text x="40" y="56" fill="#f2f3ee" font-weight="600">~/.claude/  core workflow.md</text>
+          <text x="40" y="78" fill="#f2f3ee" font-size="11">≈ 55 lines · loads EVERY session</text>
           <!-- repo layer -->
-          <rect x="20" y="122" width="330" height="70" rx="8" fill="#f6f1e7" stroke="#b5431c" stroke-width="1.6"/>
-          <text x="40" y="152" font-weight="600" fill="#221e18">repo/CLAUDE.md · CLAUDE.local.md</text>
-          <text x="40" y="174" font-size="11" fill="#5c554a">loads only inside that repo · nearest file wins</text>
+          <rect x="20" y="122" width="330" height="70" rx="8" fill="#f2f3ee" stroke="#2429dd" stroke-width="1.6"/>
+          <text x="40" y="152" font-weight="600" fill="#13141c">repo/CLAUDE.md · CLAUDE.local.md</text>
+          <text x="40" y="174" font-size="11" fill="#565a66">loads only inside that repo · nearest file wins</text>
           <!-- skills -->
-          <rect x="20" y="218" width="330" height="70" rx="8" fill="#f6f1e7" stroke="#d8cdb8" stroke-dasharray="6 4"/>
-          <text x="40" y="248" font-weight="600" fill="#221e18">skills / @-imports / nested files</text>
-          <text x="40" y="270" font-size="11" fill="#5c554a">load on demand, when the task matches</text>
+          <rect x="20" y="218" width="330" height="70" rx="8" fill="#f2f3ee" stroke="#ccd0da" stroke-dasharray="6 4"/>
+          <text x="40" y="248" font-weight="600" fill="#13141c">skills / @-imports / nested files</text>
+          <text x="40" y="270" font-size="11" fill="#565a66">load on demand, when the task matches</text>
 
           <!-- context window column -->
-          <rect x="560" y="26" width="280" height="262" rx="8" fill="#efe7d7" stroke="#d8cdb8"/>
-          <text x="580" y="54" font-size="12" fill="#5c554a" letter-spacing="2">CONTEXT WINDOW</text>
-          <rect x="580" y="70" width="240" height="34" rx="4" fill="#b5431c"/>
-          <text x="592" y="92" fill="#f6f1e7" font-size="11">core · always paid</text>
-          <rect x="580" y="112" width="240" height="34" rx="4" fill="#d97a52"/>
-          <text x="592" y="134" fill="#221e18" font-size="11">repo file · paid where relevant</text>
-          <rect x="580" y="154" width="240" height="118" rx="4" fill="#3e6b50" opacity=".88"/>
-          <text x="592" y="178" fill="#f6f1e7" font-size="11">room left for the actual task:</text>
-          <text x="592" y="198" fill="#f6f1e7" font-size="11">code · logs · diffs · thinking</text>
+          <rect x="560" y="26" width="280" height="262" rx="8" fill="#e7e9df" stroke="#ccd0da"/>
+          <text x="580" y="54" font-size="12" fill="#565a66" letter-spacing="2">CONTEXT WINDOW</text>
+          <rect x="580" y="70" width="240" height="34" rx="4" fill="#2429dd"/>
+          <text x="592" y="92" fill="#f2f3ee" font-size="11">core · always paid</text>
+          <rect x="580" y="112" width="240" height="34" rx="4" fill="#8f93ff"/>
+          <text x="592" y="134" fill="#13141c" font-size="11">repo file · paid where relevant</text>
+          <rect x="580" y="154" width="240" height="118" rx="4" fill="#c81e64" opacity=".88"/>
+          <text x="592" y="178" fill="#f2f3ee" font-size="11">room left for the actual task:</text>
+          <text x="592" y="198" fill="#f2f3ee" font-size="11">code · logs · diffs · thinking</text>
 
           <!-- arrows -->
-          <path d="M358 61 C 470 61 470 87 552 87" stroke="#3e6b50" stroke-width="2" fill="none" marker-end="url(#arr2)"/>
-          <path d="M358 157 C 470 157 470 129 552 129" stroke="#3e6b50" stroke-width="2" fill="none" marker-end="url(#arr2)"/>
-          <path d="M358 253 C 470 253 470 213 552 213" stroke="#3e6b50" stroke-width="2" fill="none" stroke-dasharray="6 4" marker-end="url(#arr2)"/>
+          <path d="M358 61 C 470 61 470 87 552 87" stroke="#c81e64" stroke-width="2" fill="none" marker-end="url(#arr2)"/>
+          <path d="M358 157 C 470 157 470 129 552 129" stroke="#c81e64" stroke-width="2" fill="none" marker-end="url(#arr2)"/>
+          <path d="M358 253 C 470 253 470 213 552 213" stroke="#c81e64" stroke-width="2" fill="none" stroke-dasharray="6 4" marker-end="url(#arr2)"/>
 
-          <text x="30" y="322" font-size="11" fill="#5c554a">the design goal: maximize the green region on every single session</text>
+          <text x="30" y="322" font-size="11" fill="#565a66">the design goal: maximize the green region on every single session</text>
         </g>
       </svg>
       </div>
@@ -422,51 +422,51 @@ svg text{font-family:"IBM Plex Mono",monospace}
         <title id="fig3t">The mining pipeline: transcripts fan out to six parallel analyzers, findings are confirmed with the human, then codified into workflow.md</title>
         <defs>
           <marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0 0 L10 5 L0 10 z" fill="#b5431c"/>
+            <path d="M0 0 L10 5 L0 10 z" fill="#2429dd"/>
           </marker>
         </defs>
         <g font-size="12">
-          <rect x="16" y="106" width="168" height="88" rx="8" fill="#efe7d7" stroke="#d8cdb8"/>
-          <text x="36" y="140" font-weight="600" fill="#221e18">380 sessions</text>
-          <text x="36" y="160" fill="#5c554a" font-size="11">~1,600 messages</text>
-          <text x="36" y="178" fill="#5c554a" font-size="11">24 projects · 5 weeks</text>
+          <rect x="16" y="106" width="168" height="88" rx="8" fill="#e7e9df" stroke="#ccd0da"/>
+          <text x="36" y="140" font-weight="600" fill="#13141c">380 sessions</text>
+          <text x="36" y="160" fill="#565a66" font-size="11">~1,600 messages</text>
+          <text x="36" y="178" fill="#565a66" font-size="11">24 projects · 5 weeks</text>
 
           <!-- fan out -->
-          <g stroke="#b5431c" stroke-width="1.8" fill="none">
+          <g stroke="#2429dd" stroke-width="1.8" fill="none">
             <path d="M192 150 C 240 150 240 52 288 52" marker-end="url(#arr3)"/>
             <path d="M192 150 C 240 150 240 118 288 118" marker-end="url(#arr3)"/>
             <path d="M192 150 C 240 150 240 184 288 184" marker-end="url(#arr3)"/>
             <path d="M192 150 C 240 150 240 250 288 250" marker-end="url(#arr3)"/>
           </g>
-          <g fill="#f6f1e7">
-            <rect x="296" y="30" width="180" height="44" rx="6" stroke="#d8cdb8"/>
-            <rect x="296" y="96" width="180" height="44" rx="6" stroke="#d8cdb8"/>
-            <rect x="296" y="162" width="180" height="44" rx="6" stroke="#d8cdb8"/>
-            <rect x="296" y="228" width="180" height="44" rx="6" stroke="#d8cdb8"/>
+          <g fill="#f2f3ee">
+            <rect x="296" y="30" width="180" height="44" rx="6" stroke="#ccd0da"/>
+            <rect x="296" y="96" width="180" height="44" rx="6" stroke="#ccd0da"/>
+            <rect x="296" y="162" width="180" height="44" rx="6" stroke="#ccd0da"/>
+            <rect x="296" y="228" width="180" height="44" rx="6" stroke="#ccd0da"/>
           </g>
-          <text x="312" y="57" fill="#221e18">communication style</text>
-          <text x="312" y="123" fill="#221e18">approval patterns</text>
-          <text x="312" y="189" fill="#b5431c" font-weight="600">corrections ★</text>
-          <text x="312" y="255" fill="#221e18">stack &amp; tooling</text>
-          <text x="486" y="57" fill="#5c554a" font-size="10">×6 parallel</text>
-          <text x="486" y="255" fill="#5c554a" font-size="10">agents</text>
+          <text x="312" y="57" fill="#13141c">communication style</text>
+          <text x="312" y="123" fill="#13141c">approval patterns</text>
+          <text x="312" y="189" fill="#2429dd" font-weight="600">corrections ★</text>
+          <text x="312" y="255" fill="#13141c">stack &amp; tooling</text>
+          <text x="486" y="57" fill="#565a66" font-size="10">×6 parallel</text>
+          <text x="486" y="255" fill="#565a66" font-size="10">agents</text>
 
           <!-- converge -->
-          <g stroke="#b5431c" stroke-width="1.8" fill="none">
+          <g stroke="#2429dd" stroke-width="1.8" fill="none">
             <path d="M484 52 C 540 52 540 132 588 132" marker-end="url(#arr3)"/>
             <path d="M484 118 C 540 118 540 146 588 146" marker-end="url(#arr3)"/>
             <path d="M484 184 C 540 184 540 158 588 158" marker-end="url(#arr3)"/>
             <path d="M484 250 C 540 250 540 172 588 172" marker-end="url(#arr3)"/>
           </g>
-          <rect x="596" y="106" width="110" height="88" rx="8" fill="#efe7d7" stroke="#d8cdb8"/>
-          <text x="612" y="142" font-weight="600" fill="#221e18">≥3× rule</text>
-          <text x="612" y="162" fill="#5c554a" font-size="11">+ human</text>
-          <text x="612" y="178" fill="#5c554a" font-size="11">confirms</text>
+          <rect x="596" y="106" width="110" height="88" rx="8" fill="#e7e9df" stroke="#ccd0da"/>
+          <text x="612" y="142" font-weight="600" fill="#13141c">≥3× rule</text>
+          <text x="612" y="162" fill="#565a66" font-size="11">+ human</text>
+          <text x="612" y="178" fill="#565a66" font-size="11">confirms</text>
 
-          <path d="M714 150 h36" stroke="#b5431c" stroke-width="1.8" fill="none" marker-end="url(#arr3)"/>
-          <rect x="758" y="112" width="88" height="76" rx="8" fill="#b5431c"/>
-          <text x="772" y="146" fill="#f6f1e7" font-weight="600" font-size="12">workflow</text>
-          <text x="772" y="164" fill="#f6f1e7" font-weight="600" font-size="12">.md v1</text>
+          <path d="M714 150 h36" stroke="#2429dd" stroke-width="1.8" fill="none" marker-end="url(#arr3)"/>
+          <rect x="758" y="112" width="88" height="76" rx="8" fill="#2429dd"/>
+          <text x="772" y="146" fill="#f2f3ee" font-weight="600" font-size="12">workflow</text>
+          <text x="772" y="164" fill="#f2f3ee" font-weight="600" font-size="12">.md v1</text>
         </g>
       </svg>
       </div>
@@ -484,17 +484,17 @@ svg text{font-family:"IBM Plex Mono",monospace}
         <title id="fig4t">Research funnel: 24 sources, 104 claims, 25 verified candidates, 9 surviving claims, 8 synthesized findings</title>
         <g font-size="12">
           <!-- funnel bars, widths ∝ sqrt for visibility -->
-          <rect x="30"  y="30"  width="800" height="30" rx="4" fill="#d8cdb8"/>
-          <rect x="110" y="76"  width="640" height="30" rx="4" fill="#d97a52"/>
-          <rect x="270" y="122" width="320" height="30" rx="4" fill="#b5431c"/>
-          <rect x="335" y="168" width="190" height="30" rx="4" fill="#3e6b50"/>
-          <rect x="352" y="214" width="156" height="30" rx="4" fill="#221e18"/>
-          <text x="44"  y="50"  fill="#221e18">24 sources fetched · 5 search angles</text>
-          <text x="124" y="96"  fill="#221e18">104 falsifiable claims extracted</text>
-          <text x="284" y="142" fill="#f6f1e7">25 sent to verification</text>
-          <text x="349" y="188" fill="#f6f1e7">9 survived 3 skeptics</text>
-          <text x="366" y="234" fill="#f6f1e7">8 final findings</text>
-          <text x="700" y="142" fill="#5c554a" font-size="11">← 16 killed here</text>
+          <rect x="30"  y="30"  width="800" height="30" rx="4" fill="#ccd0da"/>
+          <rect x="110" y="76"  width="640" height="30" rx="4" fill="#8f93ff"/>
+          <rect x="270" y="122" width="320" height="30" rx="4" fill="#2429dd"/>
+          <rect x="335" y="168" width="190" height="30" rx="4" fill="#c81e64"/>
+          <rect x="352" y="214" width="156" height="30" rx="4" fill="#13141c"/>
+          <text x="44"  y="50"  fill="#13141c">24 sources fetched · 5 search angles</text>
+          <text x="124" y="96"  fill="#13141c">104 falsifiable claims extracted</text>
+          <text x="284" y="142" fill="#f2f3ee">25 sent to verification</text>
+          <text x="349" y="188" fill="#f2f3ee">9 survived 3 skeptics</text>
+          <text x="366" y="234" fill="#f2f3ee">8 final findings</text>
+          <text x="700" y="142" fill="#565a66" font-size="11">← 16 killed here</text>
         </g>
       </svg>
       </div>
@@ -510,47 +510,47 @@ svg text{font-family:"IBM Plex Mono",monospace}
       <svg viewBox="0 0 860 320" role="img" aria-labelledby="fig5t">
         <title id="fig5t">Before: one 95-line file loaded everywhere. After: a 55-line core plus per-repo files and skills loading only where relevant.</title>
         <g font-size="12">
-          <text x="30" y="34" fill="#5c554a" letter-spacing="2" font-size="12">BEFORE</text>
-          <rect x="30" y="50" width="300" height="196" rx="8" fill="#f6f1e7" stroke="#b5431c" stroke-width="1.6"/>
-          <text x="50" y="82" font-weight="600" fill="#221e18">workflow.md · 95 lines</text>
-          <g fill="#5c554a" font-size="11">
+          <text x="30" y="34" fill="#565a66" letter-spacing="2" font-size="12">BEFORE</text>
+          <rect x="30" y="50" width="300" height="196" rx="8" fill="#f2f3ee" stroke="#2429dd" stroke-width="1.6"/>
+          <text x="50" y="82" font-weight="600" fill="#13141c">workflow.md · 95 lines</text>
+          <g fill="#565a66" font-size="11">
             <text x="50" y="110">communication + autonomy</text>
             <text x="50" y="130">frontend repo conventions</text>
             <text x="50" y="150">backend repo conventions</text>
             <text x="50" y="170">edge-fleet runbook details</text>
             <text x="50" y="190">domain facts · deploy rituals</text>
           </g>
-          <text x="50" y="226" fill="#b5431c" font-size="11" font-weight="600">every session pays for all of it</text>
+          <text x="50" y="226" fill="#2429dd" font-size="11" font-weight="600">every session pays for all of it</text>
 
-          <text x="30" y="292" fill="#5c554a" font-size="11">side-project session? still carries the</text>
-          <text x="30" y="308" fill="#5c554a" font-size="11">edge-fleet runbook. dead weight.</text>
+          <text x="30" y="292" fill="#565a66" font-size="11">side-project session? still carries the</text>
+          <text x="30" y="308" fill="#565a66" font-size="11">edge-fleet runbook. dead weight.</text>
 
           <!-- divider -->
-          <line x1="400" y1="40" x2="400" y2="300" stroke="#d8cdb8" stroke-dasharray="3 6"/>
+          <line x1="400" y1="40" x2="400" y2="300" stroke="#ccd0da" stroke-dasharray="3 6"/>
 
-          <text x="450" y="34" fill="#5c554a" letter-spacing="2" font-size="12">AFTER</text>
-          <rect x="450" y="50" width="380" height="64" rx="8" fill="#b5431c"/>
-          <text x="470" y="76" fill="#f6f1e7" font-weight="600">core · 55 lines · always on</text>
-          <text x="470" y="96" fill="#f6f1e7" font-size="11">how I communicate · autonomy · hard rules · pointers</text>
-          <g fill="#f6f1e7">
-            <rect x="450" y="132" width="182" height="56" rx="6" stroke="#d8cdb8"/>
-            <rect x="648" y="132" width="182" height="56" rx="6" stroke="#d8cdb8"/>
-            <rect x="450" y="204" width="182" height="56" rx="6" stroke="#d8cdb8"/>
-            <rect x="648" y="204" width="182" height="56" rx="6" stroke="#d8cdb8"/>
+          <text x="450" y="34" fill="#565a66" letter-spacing="2" font-size="12">AFTER</text>
+          <rect x="450" y="50" width="380" height="64" rx="8" fill="#2429dd"/>
+          <text x="470" y="76" fill="#f2f3ee" font-weight="600">core · 55 lines · always on</text>
+          <text x="470" y="96" fill="#f2f3ee" font-size="11">how I communicate · autonomy · hard rules · pointers</text>
+          <g fill="#f2f3ee">
+            <rect x="450" y="132" width="182" height="56" rx="6" stroke="#ccd0da"/>
+            <rect x="648" y="132" width="182" height="56" rx="6" stroke="#ccd0da"/>
+            <rect x="450" y="204" width="182" height="56" rx="6" stroke="#ccd0da"/>
+            <rect x="648" y="204" width="182" height="56" rx="6" stroke="#ccd0da"/>
           </g>
-          <g fill="#221e18" font-size="11">
+          <g fill="#13141c" font-size="11">
             <text x="466" y="156">frontend repo file</text>
             <text x="664" y="156">backend repo file</text>
             <text x="466" y="228">edge repo file</text>
             <text x="664" y="228">solo-project file</text>
           </g>
-          <g fill="#5c554a" font-size="10">
+          <g fill="#565a66" font-size="10">
             <text x="466" y="174">loads in that repo only</text>
             <text x="664" y="174">loads in that repo only</text>
             <text x="466" y="246">untracked · personal</text>
             <text x="664" y="246">+ deploy via a skill</text>
           </g>
-          <text x="450" y="296" fill="#3e6b50" font-size="11" font-weight="600">each session carries only what it can use — nearest file wins</text>
+          <text x="450" y="296" fill="#c81e64" font-size="11" font-weight="600">each session carries only what it can use — nearest file wins</text>
         </g>
       </svg>
       </div>
