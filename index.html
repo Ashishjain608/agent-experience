@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Experience — a field guide from practice</title>
+<meta name="description" content="What verifiably works when you design codebases, context files, and workflows for AI coding agents — plus a case study: mining 380 of my own Claude Code sessions into a workflow.md, then refactoring it with AX principles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f6f1e7;
+  --paper-deep:#efe7d7;
+  --ink:#221e18;
+  --ink-soft:#5c554a;
+  --rust:#b5431c;
+  --rust-soft:#d97a52;
+  --moss:#3e6b50;
+  --hairline:#d8cdb8;
+  --measure:66ch;
+  --serif:"Newsreader",Georgia,serif;
+  --display:"Fraunces",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--serif);
+  font-size:1.185rem;
+  line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+}
+/* paper grain */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:5;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* reading progress — CSS scroll-driven, no JS */
+.progress{position:fixed;top:0;left:0;height:4px;width:100%;background:var(--rust);transform-origin:0 50%;transform:scaleX(0);z-index:50}
+@supports (animation-timeline:scroll()){
+  .progress{animation:grow linear both;animation-timeline:scroll(root)}
+  @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+}
+a{color:var(--rust);text-decoration-color:color-mix(in srgb,var(--rust) 40%,transparent);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--rust)}
+a:focus-visible{outline:2px solid var(--rust);outline-offset:3px;border-radius:2px}
+.wrap{max-width:78rem;margin:0 auto;padding:0 1.4rem}
+.col{max-width:var(--measure);margin:0 auto}
+
+/* ---------- masthead ---------- */
+header.masthead{padding:5.5rem 0 3.5rem;border-bottom:3px double var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--rust);display:flex;gap:1.2rem;align-items:baseline;flex-wrap:wrap}
+.eyebrow .rule{flex:1;border-top:1px solid var(--hairline);transform:translateY(-4px)}
+h1{
+  font-family:var(--display);
+  font-weight:560;
+  font-size:clamp(2.7rem,7.2vw,5.4rem);
+  line-height:1.02;
+  letter-spacing:-.015em;
+  margin:1.6rem 0 1.4rem;
+  font-variation-settings:"opsz" 144;
+}
+h1 em{font-style:italic;color:var(--rust)}
+.dek{font-size:clamp(1.15rem,2.2vw,1.45rem);font-style:italic;color:var(--ink-soft);max-width:44ch;line-height:1.5}
+.byline{margin-top:2.2rem;font-family:var(--mono);font-size:.82rem;color:var(--ink-soft);display:flex;gap:.6em;flex-wrap:wrap;align-items:center}
+.byline b{color:var(--ink);font-weight:500}
+.byline .dot{color:var(--rust)}
+
+/* ---------- toc ---------- */
+nav.toc{border-bottom:1px solid var(--hairline);padding:1.8rem 0}
+nav.toc ol{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.55rem 2.4rem;counter-reset:toc}
+nav.toc a{display:flex;gap:.9em;align-items:baseline;text-decoration:none;color:var(--ink);font-size:1.02rem;padding:.15rem 0}
+nav.toc a::before{counter-increment:toc;content:counter(toc,decimal-leading-zero);font-family:var(--mono);font-size:.75rem;color:var(--rust)}
+nav.toc a:hover{color:var(--rust)}
+
+/* ---------- sections ---------- */
+main{padding-bottom:2rem}
+section{padding:4.2rem 0 1.2rem;scroll-margin-top:2.5rem}
+.kicker{display:flex;align-items:baseline;gap:1.1rem;margin-bottom:2.1rem}
+.kicker .num{font-family:var(--display);font-weight:300;font-style:italic;font-size:3.4rem;line-height:1;color:var(--rust-soft)}
+.kicker h2{font-family:var(--display);font-weight:600;font-size:clamp(1.65rem,3.4vw,2.35rem);line-height:1.12;letter-spacing:-.01em}
+p{margin-bottom:1.35rem}
+p.open::first-letter{
+  font-family:var(--display);font-weight:600;font-size:4.6rem;float:left;
+  line-height:.78;padding:.09em .12em 0 0;color:var(--rust);
+}
+strong{font-weight:600}
+h3{font-family:var(--display);font-size:1.32rem;font-weight:600;margin:2.4rem 0 .9rem}
+.mono,code{font-family:var(--mono);font-size:.86em;background:var(--paper-deep);padding:.1em .38em;border-radius:3px}
+ul.loose,ol.loose{margin:0 0 1.4rem 1.3rem}
+ul.loose li,ol.loose li{margin-bottom:.55rem;padding-left:.3rem}
+
+/* margin notes */
+.noted{display:grid;grid-template-columns:minmax(0,var(--measure)) minmax(11rem,15rem);gap:2.6rem;justify-content:center}
+.note{font-family:var(--mono);font-size:.76rem;line-height:1.55;color:var(--ink-soft);border-top:2px solid var(--rust);padding-top:.55rem;height:fit-content;position:sticky;top:5rem}
+.note b{color:var(--rust);font-weight:500}
+@media (max-width:64rem){
+  .noted{display:block}
+  .note{position:static;margin:0 auto 1.6rem;max-width:var(--measure);border:1px solid var(--hairline);border-top:2px solid var(--rust);padding:.7rem .9rem;background:var(--paper-deep)}
+}
+
+/* insight callout — the eye-opener boxes */
+.insight{
+  margin:2.4rem 0;padding:1.5rem 1.7rem;
+  background:var(--ink);color:var(--paper);border-radius:6px;
+  font-family:var(--display);font-size:1.28rem;line-height:1.45;font-weight:480;
+  position:relative;
+}
+.insight::before{
+  content:"THE SHIFT";position:absolute;top:-.62rem;left:1.4rem;
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;
+  background:var(--rust);color:var(--paper);padding:.2em .7em;border-radius:2px;
+}
+.insight em{color:var(--rust-soft);font-style:italic}
+
+/* pull quote */
+blockquote.pull{
+  margin:2.8rem auto;max-width:34ch;text-align:center;
+  font-family:var(--display);font-style:italic;font-weight:480;
+  font-size:clamp(1.45rem,3vw,1.95rem);line-height:1.35;color:var(--ink);
+}
+blockquote.pull::before{content:"";display:block;width:3.2rem;height:3px;background:var(--rust);margin:0 auto 1.5rem}
+blockquote.pull cite{display:block;margin-top:1.2rem;font-family:var(--mono);font-style:normal;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+
+/* practice cards */
+.practice{border-top:1px solid var(--hairline);padding:1.7rem 0 .4rem;}
+.practice:last-of-type{border-bottom:1px solid var(--hairline);margin-bottom:2rem;padding-bottom:1.4rem}
+.practice h3{margin:0 0 .7rem;display:flex;gap:.85em;align-items:baseline}
+.practice h3 .pn{font-family:var(--mono);font-weight:400;font-size:.8rem;color:var(--rust)}
+.practice .src{font-family:var(--mono);font-size:.74rem;color:var(--ink-soft);margin-bottom:.4rem}
+
+/* myths ledger */
+.myth{display:flex;gap:1rem;align-items:baseline;border-top:1px dashed var(--hairline);padding:.85rem 0}
+.myth:last-of-type{border-bottom:1px dashed var(--hairline);margin-bottom:1.6rem}
+.myth .verdict{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;color:var(--paper);background:var(--ink);padding:.22em .55em;border-radius:2px;white-space:nowrap}
+.myth .claim{font-style:italic}
+.myth .why{display:block;font-style:normal;font-size:.92rem;color:var(--ink-soft);margin-top:.2rem}
+
+/* figures */
+figure{margin:3rem auto;max-width:52rem}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-family:var(--mono);font-size:.76rem;color:var(--ink-soft);text-align:center;margin-top:1rem;letter-spacing:.02em}
+figcaption b{color:var(--rust);font-weight:500}
+.fig-frame{background:var(--paper-deep);border:1px solid var(--hairline);border-radius:6px;padding:clamp(.8rem,2.5vw,2rem)}
+
+/* checklist */
+.check{list-style:none;margin:0 0 1.5rem;counter-reset:chk}
+.check li{position:relative;padding:.8rem 0 .8rem 3rem;border-top:1px solid var(--hairline)}
+.check li:last-child{border-bottom:1px solid var(--hairline)}
+.check li::before{
+  counter-increment:chk;content:counter(chk,decimal-leading-zero);
+  position:absolute;left:.2rem;top:.95rem;font-family:var(--mono);font-size:.78rem;color:var(--rust);
+}
+
+/* sources */
+.sources ol{margin-left:1.6rem}
+.sources li{margin-bottom:.7rem;font-size:1rem}
+.sources li::marker{font-family:var(--mono);font-size:.8rem;color:var(--rust)}
+sup a{font-family:var(--mono);font-size:.68em;text-decoration:none;padding:0 .1em}
+
+/* footer */
+footer{border-top:3px double var(--ink);margin-top:4rem;padding:2.4rem 0 4rem;font-family:var(--mono);font-size:.8rem;color:var(--ink-soft);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+footer a{color:var(--rust)}
+
+/* svg shared text styles */
+svg text{font-family:"IBM Plex Mono",monospace}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="col" style="max-width:56rem">
+    <p class="eyebrow"><span>Field guide · №&nbsp;01</span><span class="rule"></span><span>Agent&nbsp;Experience</span></p>
+    <h1>Your fastest teammate reads <em>everything</em> you leave lying around</h1>
+    <p class="dek">A practical guide to Agent Experience — what verifiably works when you design a codebase for AI coding agents, and what turned out to be folklore.</p>
+    <p class="byline"><b>Ashish Jain</b><span class="dot">●</span><span>July 2026</span><span class="dot">●</span><span>~14 min read</span></p>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <div class="col" style="max-width:56rem">
+    <ol>
+      <li><a href="#new-teammate">A teammate with no memory</a></li>
+      <li><a href="#what-is-ax">What Agent Experience actually is</a></li>
+      <li><a href="#one-constraint">The constraint that governs everything</a></li>
+      <li><a href="#what-works">Six practices that survived verification</a></li>
+      <li><a href="#myths">The folklore that didn't</a></li>
+      <li><a href="#case-study">Case study: teaching an agent how I work</a></li>
+      <li><a href="#diy">Do this yourself in an afternoon</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ol>
+  </div>
+</nav>
+
+<main>
+
+<!-- ══════════════ 01 ══════════════ -->
+<section id="new-teammate">
+  <div class="noted">
+    <div>
+      <div class="kicker"><span class="num">01</span><h2>A teammate with no memory</h2></div>
+      <p class="open">Every morning a brilliant engineer joins your team. They type faster than anyone you've met, they've read more code than you ever will — and they remember nothing. Not yesterday's decisions, not the deploy ritual, not the one directory nobody is allowed to touch. Whatever they need to know, they must find in the next few minutes, inside your repository, or they will guess.</p>
+      <p>That is the working condition of every AI coding agent — Claude Code, Cursor, Codex, Copilot, aider. And it reframes a question most teams haven't asked yet: <strong>we spend enormous care on developer experience for humans; what is the experience of the agent?</strong></p>
+      <p>Here's what makes this urgent rather than academic. It took the industry two decades to take DX seriously — linters, onboarding docs, one-command dev environments. AX is in year two, agents are already writing a meaningful share of the world's code, and the repos they work in were designed for readers who remember things. <strong>The gap between a repo that onboards an agent well and one that doesn't is now a productivity gap between you and everyone else.</strong></p>
+      <div class="insight">Stop asking “how do I prompt better?” — that optimizes one conversation. Start asking “what does <em>every</em> agent session inherit from my repo?” — that optimizes all of them, forever.</div>
+      <p>Six months ago I started treating that question as an engineering problem. This post is what I can back with sources: the definitions, the handful of practices that survive adversarial fact-checking, the popular claims that don't — and a case study where I mined five weeks of my own Claude Code transcripts, distilled them into a <code>workflow.md</code>, and then used AX principles to refactor it.</p>
+    </div>
+    <aside class="note"><b>tl;dr</b><br>Agents rebuild their entire world from your repo, every session. Design for that and they get dramatically better. Most advice about <i>how</i> is unverified — a small core is not.</aside>
+  </div>
+</section>
+
+<!-- ══════════════ 02 ══════════════ -->
+<section id="what-is-ax">
+  <div class="noted">
+    <div>
+      <div class="kicker"><span class="num">02</span><h2>What Agent Experience actually is</h2></div>
+      <p>The term has a birthday. On January 28, 2025, Netlify CEO Mathias Biilmann published <i>Introducing AX</i>,<sup><a href="#s1">1</a></sup> defining Agent Experience as <strong>“the holistic experience AI agents have when interacting with a product, platform, or system.”</strong> The community site that grew around it, agentexperience.ax,<sup><a href="#s2">2</a></sup> decomposes that experience into three properties, and they make a surprisingly sharp checklist:</p>
+    </div>
+    <aside class="note"><b>born</b> 2025-01-28<br>Coined by Mathias Biilmann (Netlify). Formalized at agentexperience.ax. The field is under two years old — hold all specifics loosely.</aside>
+  </div>
+
+  <figure>
+    <div class="fig-frame">
+    <svg viewBox="0 0 860 240" role="img" aria-labelledby="fig1t">
+      <title id="fig1t">The three properties of Agent Experience: accessibility, comprehension, operability</title>
+      <g font-size="13" fill="#221e18">
+        <!-- card 1 -->
+        <rect x="10" y="30" width="260" height="170" rx="8" fill="#f6f1e7" stroke="#d8cdb8"/>
+        <text x="30" y="66" font-size="15" font-weight="600" fill="#b5431c">ACCESSIBILITY</text>
+        <text x="30" y="98">Can the agent reach</text>
+        <text x="30" y="118">what it needs?</text>
+        <text x="30" y="156" font-size="11" fill="#5c554a">paths · APIs · commands</text>
+        <text x="30" y="174" font-size="11" fill="#5c554a">docs it can actually open</text>
+        <!-- arrow -->
+        <path d="M278 115 h24" stroke="#b5431c" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- card 2 -->
+        <rect x="310" y="30" width="260" height="170" rx="8" fill="#f6f1e7" stroke="#d8cdb8"/>
+        <text x="330" y="66" font-size="15" font-weight="600" fill="#b5431c">COMPREHENSION</text>
+        <text x="330" y="98">Can it understand</text>
+        <text x="330" y="118">what it found?</text>
+        <text x="330" y="156" font-size="11" fill="#5c554a">conventions stated once</text>
+        <text x="330" y="174" font-size="11" fill="#5c554a">names that mean things</text>
+        <path d="M578 115 h24" stroke="#b5431c" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- card 3 -->
+        <rect x="610" y="30" width="240" height="170" rx="8" fill="#f6f1e7" stroke="#d8cdb8"/>
+        <text x="630" y="66" font-size="15" font-weight="600" fill="#b5431c">OPERABILITY</text>
+        <text x="630" y="98">Can it act on it,</text>
+        <text x="630" y="118">toward your goal?</text>
+        <text x="630" y="156" font-size="11" fill="#5c554a">runnable verification</text>
+        <text x="630" y="174" font-size="11" fill="#5c554a">clear autonomy limits</text>
+      </g>
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="#b5431c"/>
+        </marker>
+      </defs>
+    </svg>
+    </div>
+    <figcaption><b>fig. 1</b> — every line of agent-facing docs should improve at least one of these; otherwise it's dead weight</figcaption>
+  </figure>
+
+  <div class="noted">
+    <div>
+      <p>The second framing worth keeping comes from Sean Grove of OpenAI, in his AI Engineer World's Fair 2025 talk.<sup><a href="#s8">8</a></sup> Watching teams prompt an agent, merge the generated code, and throw the prompt away, he observed:</p>
+      <blockquote class="pull">“You shred the source and then very carefully version-control the binary.”
+      <cite>— Sean Grove, AI Engineer World's Fair 2025</cite></blockquote>
+      <p>The prompt — the <em>intent</em> — was the real source. The practical consequence: the files that steer your agents (<code>CLAUDE.md</code>, <code>AGENTS.md</code>, a <code>workflow.md</code>) are not throwaway config. They are durable, git-versioned artifacts, and when a session goes well, the decisions that made it go well belong back in the file.</p>
+    </div>
+    <aside class="note"><b>careful</b><br>Grove's stronger claims — “specs are a lossless format”, “the spec-writer is the programmer” — did <i>not</i> survive fact-checking. Only the shredding anti-pattern is load-bearing.</aside>
+  </div>
+</section>
+
+<!-- ══════════════ 03 ══════════════ -->
+<section id="one-constraint">
+  <div class="noted">
+    <div>
+      <div class="kicker"><span class="num">03</span><h2>The constraint that governs everything</h2></div>
+      <p>Almost every verified AX practice turns out to be downstream of a single fact: <strong>the context window is the scarcest resource in an agentic session, and model quality degrades as it fills.</strong></p>
+      <p>This isn't vibes. Anthropic's official Claude Code guidance states it flatly — “LLM performance degrades as context fills… the context window is the most important resource to manage”<sup><a href="#s3">3</a></sup> — and Chroma's <i>Context Rot</i> study found the same pattern empirically across all eighteen production models it tested, with accuracy declining monotonically as input grows, long before the window is technically full.<sup><a href="#s4">4</a></sup></p>
+      <p>Now connect that to how steering files load. They are <strong>eager, startup-time injections</strong>: read once when the session starts, placed at the front of the context, paid on <em>every</em> session whether or not they're relevant to the task.<sup><a href="#s6">6</a></sup> Every always-loaded line competes with the code the agent is actually trying to hold in its head. A bloated rules file doesn't just waste tokens — it actively makes the agent worse at the task <em>and</em> worse at following the rules themselves.</p>
+      <p>Which is why the single most counter-intuitive finding in the vendor docs is this: <strong>bloat is a correctness bug.</strong> Anthropic again: if Claude keeps ignoring one of your rules, “the file is probably too long and the rule is getting lost.”<sup><a href="#s3">3</a></sup></p>
+      <div class="insight">When an agent disobeys a rule, almost everyone adds emphasis — bold it, repeat it, CAPS IT. The evidence says do the opposite: <em>delete other rules.</em> Disobedience is a symptom of crowding, not defiance.</div>
+      <p>Sit with that for a second, because it inverts a deep habit. Every ignored instruction you've ever "fixed" by shouting louder probably got fixed by coincidence — the real lever was always the total weight of everything else in the file.</p>
+    </div>
+    <aside class="note"><b>rules of thumb</b><br>corroboration-grade, not proven:<br><br>~150–200 total instructions is the budget (HumanLayer) · diminishing returns past ~500 words, <i>negative</i> correlation past ~1,000 (2,500-repo analysis) · Cursor: keep rules &lt;500 lines, split into focused files<sup><a href="#s7">7</a></sup></aside>
+  </div>
+</section>
+
+<!-- ══════════════ 04 ══════════════ -->
+<section id="what-works">
+  <div class="col">
+    <div class="kicker"><span class="num">04</span><h2>Six practices that survived verification</h2></div>
+    <p>I put the popular advice through an adversarial research pipeline (three independent skeptic votes per claim — more on the machinery in the case study). Of twenty-five candidate claims, <strong>nine survived</strong>. They merge into six practices you can apply today.</p>
+
+    <div class="practice">
+      <h3><span class="pn">P1</span>Keep the always-on file ruthlessly small</h3>
+      <p class="src">Anthropic best practices · Cursor rules docs<sup><a href="#s3">3</a>,<a href="#s7">7</a></sup></p>
+      <p>Focused, actionable, scoped rules; split anything big into composable files. Treat every ignored instruction as a signal to cut the file, not to emphasize the rule.</p>
+    </div>
+
+    <div class="practice">
+      <h3><span class="pn">P2</span>Pointers, not payloads</h3>
+      <p class="src">Anthropic engineering — context engineering<sup><a href="#s5">5</a></sup></p>
+      <p>Agents can fetch at runtime. <code>auth flow: see docs/auth.md</code> beats pasting the auth flow; <code>verify with make test</code> beats describing the test suite. Lightweight identifiers mirror how humans use bookmarks and indexes instead of memorizing corpuses — slightly slower per lookup, massively cheaper per session.</p>
+    </div>
+
+    <div class="practice">
+      <h3><span class="pn">P3</span>Layer context hierarchically</h3>
+      <p class="src">OpenAI Codex AGENTS.md guide<sup><a href="#s6">6</a></sup></p>
+      <p>Steering files merge root-to-cwd, and the file nearest the working directory wins (it appears last in the combined prompt). So: a minimal universal core, with module-specific conventions, build commands, and gotchas pushed into nested files that only load — or only dominate — where they apply.</p>
+    </div>
+
+    <div class="practice">
+      <h3><span class="pn">P4</span>Load conditionally — progressive disclosure</h3>
+      <p class="src">Cursor rules docs<sup><a href="#s7">7</a></sup></p>
+      <p>Cursor makes the pattern explicit with frontmatter: always-on rules, glob-attached rules, description-triggered rules, manual ones. Whatever your tool, emulate the shape: an always-on minimal core, with task-specific guidance in skills and scoped files that enter context only when the situation matches.</p>
+    </div>
+
+    <div class="practice">
+      <h3><span class="pn">P5</span>Know the loading mechanics of your tool</h3>
+      <p class="src">OpenAI Codex docs &amp; issue tracker<sup><a href="#s6">6</a></sup></p>
+      <p>Steering files are read before any work begins and cached for the session — mid-session edits don't take effect until restart. Your file is effectively an extension of the system prompt. Budget it like one. (And re-check the mechanics occasionally; they are actively changing across tools.)</p>
+    </div>
+
+    <div class="practice">
+      <h3><span class="pn">P6</span>Version intent, not just output</h3>
+      <p class="src">Sean Grove, AI Engineer 2025<sup><a href="#s8">8</a></sup></p>
+      <p>When a session produces a great result, the diff is the least interesting artifact. Fold the effective decisions, constraints, and corrections back into the versioned steering file, so the next session — tomorrow's amnesiac genius — starts where this one ended.</p>
+    </div>
+
+    <figure>
+      <div class="fig-frame">
+      <svg viewBox="0 0 860 340" role="img" aria-labelledby="fig2t">
+        <title id="fig2t">Layered context loading: a small always-on core, per-repo files, and skills that load on demand</title>
+        <defs>
+          <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#3e6b50"/>
+          </marker>
+        </defs>
+        <g font-size="13">
+          <!-- always-on -->
+          <rect x="20" y="26" width="330" height="70" rx="8" fill="#b5431c"/>
+          <text x="40" y="56" fill="#f6f1e7" font-weight="600">~/.claude/  core workflow.md</text>
+          <text x="40" y="78" fill="#f6f1e7" font-size="11">≈ 55 lines · loads EVERY session</text>
+          <!-- repo layer -->
+          <rect x="20" y="122" width="330" height="70" rx="8" fill="#f6f1e7" stroke="#b5431c" stroke-width="1.6"/>
+          <text x="40" y="152" font-weight="600" fill="#221e18">repo/CLAUDE.md · CLAUDE.local.md</text>
+          <text x="40" y="174" font-size="11" fill="#5c554a">loads only inside that repo · nearest file wins</text>
+          <!-- skills -->
+          <rect x="20" y="218" width="330" height="70" rx="8" fill="#f6f1e7" stroke="#d8cdb8" stroke-dasharray="6 4"/>
+          <text x="40" y="248" font-weight="600" fill="#221e18">skills / @-imports / nested files</text>
+          <text x="40" y="270" font-size="11" fill="#5c554a">load on demand, when the task matches</text>
+
+          <!-- context window column -->
+          <rect x="560" y="26" width="280" height="262" rx="8" fill="#efe7d7" stroke="#d8cdb8"/>
+          <text x="580" y="54" font-size="12" fill="#5c554a" letter-spacing="2">CONTEXT WINDOW</text>
+          <rect x="580" y="70" width="240" height="34" rx="4" fill="#b5431c"/>
+          <text x="592" y="92" fill="#f6f1e7" font-size="11">core · always paid</text>
+          <rect x="580" y="112" width="240" height="34" rx="4" fill="#d97a52"/>
+          <text x="592" y="134" fill="#221e18" font-size="11">repo file · paid where relevant</text>
+          <rect x="580" y="154" width="240" height="118" rx="4" fill="#3e6b50" opacity=".88"/>
+          <text x="592" y="178" fill="#f6f1e7" font-size="11">room left for the actual task:</text>
+          <text x="592" y="198" fill="#f6f1e7" font-size="11">code · logs · diffs · thinking</text>
+
+          <!-- arrows -->
+          <path d="M358 61 C 470 61 470 87 552 87" stroke="#3e6b50" stroke-width="2" fill="none" marker-end="url(#arr2)"/>
+          <path d="M358 157 C 470 157 470 129 552 129" stroke="#3e6b50" stroke-width="2" fill="none" marker-end="url(#arr2)"/>
+          <path d="M358 253 C 470 253 470 213 552 213" stroke="#3e6b50" stroke-width="2" fill="none" stroke-dasharray="6 4" marker-end="url(#arr2)"/>
+
+          <text x="30" y="322" font-size="11" fill="#5c554a">the design goal: maximize the green region on every single session</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption><b>fig. 2</b> — hierarchical + conditional loading (P3, P4): pay for context only where it earns its keep</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ══════════════ 05 ══════════════ -->
+<section id="myths">
+  <div class="noted">
+    <div>
+      <div class="kicker"><span class="num">05</span><h2>The folklore that didn't survive</h2></div>
+      <p>This part rarely makes it into blog posts, and it might be the most useful section here: <strong>64% of the field's popular claims died under verification.</strong> Sixteen of twenty-five candidates were killed — mostly for overreach beyond what their sources actually say. AX is young enough that its conventional wisdom formed faster than its evidence. If you've seen these repeated as settled fact, treat them as open questions:</p>
+
+      <div class="myth"><span class="verdict">0–3</span><p class="claim">“Specs are a lossless format; the spec-writer is the programmer now.”<span class="why">Rhetoric from a great talk, not an established result.</span></p></div>
+      <div class="myth"><span class="verdict">0–3</span><p class="claim">“Context rot is universal and caused by n² attention.”<span class="why">Degradation is real and measured; this mechanistic formulation overreaches.</span></p></div>
+      <div class="myth"><span class="verdict">0–3</span><p class="claim">“Verification loops let agents iterate fully autonomously.”<span class="why">Feedback loops help; 'no human needed' is unsupported.</span></p></div>
+      <div class="myth"><span class="verdict">0–3</span><p class="claim">“Self-updating CLAUDE.md loops measurably improve later sessions.”<span class="why">Untested rather than false — nobody has published the measurement.</span></p></div>
+      <div class="myth"><span class="verdict">0–3</span><p class="claim">“AGENTS.md has a 32 KiB combined size cap.”<span class="why">Widely quoted, not in the docs. Don't build on it.</span></p></div>
+
+      <p>Two honest caveats about the survivors, too: the evidence base is dominated by first-party vendor documentation — authoritative on how the tools <em>behave</em>, potentially self-serving on how much it <em>matters</em> — and the field is young enough that loading mechanics change under your feet. Verify against current docs before hard-coding any of this.</p>
+    </div>
+    <aside class="note"><b>0–3</b> means zero of three independent skeptic agents could defend the claim against refutation. Killed ≠ disproven — killed means <i>you shouldn't build on it yet</i>.</aside>
+  </div>
+</section>
+
+<!-- ══════════════ 06 ══════════════ -->
+<section id="case-study">
+  <div class="col">
+    <div class="kicker"><span class="num">06</span><h2>Case study: teaching an agent how I work</h2></div>
+    <p class="open">Theory is cheap, so here is the whole loop, run on myself. I use Claude Code daily — at my day job on a production platform, and at night on side projects. Every session leaves a transcript on disk, and almost everyone treats those transcripts as exhaust. They're not.</p>
+    <div class="insight">Your agent transcripts are a behavioral dataset <em>about you</em> — every correction you've typed is a labeled training example of what you actually want. Nobody is mining them. Mine them.</div>
+
+    <h3>Step 1 — Mine the transcripts</h3>
+    <p>I pointed the agent at five weeks of its own history: <strong>380 interactive sessions across 24 projects — about 1,600 human-typed messages</strong>. Six analyzer sub-agents ran in parallel, one per project group, each hunting for durable signals: how I phrase requests, what I approve without review, and — most valuable of all — every moment I pushed back. The rule: a pattern had to appear <strong>three or more times</strong> to count. One-offs were discarded.</p>
+
+    <figure>
+      <div class="fig-frame">
+      <svg viewBox="0 0 860 300" role="img" aria-labelledby="fig3t">
+        <title id="fig3t">The mining pipeline: transcripts fan out to six parallel analyzers, findings are confirmed with the human, then codified into workflow.md</title>
+        <defs>
+          <marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#b5431c"/>
+          </marker>
+        </defs>
+        <g font-size="12">
+          <rect x="16" y="106" width="168" height="88" rx="8" fill="#efe7d7" stroke="#d8cdb8"/>
+          <text x="36" y="140" font-weight="600" fill="#221e18">380 sessions</text>
+          <text x="36" y="160" fill="#5c554a" font-size="11">~1,600 messages</text>
+          <text x="36" y="178" fill="#5c554a" font-size="11">24 projects · 5 weeks</text>
+
+          <!-- fan out -->
+          <g stroke="#b5431c" stroke-width="1.8" fill="none">
+            <path d="M192 150 C 240 150 240 52 288 52" marker-end="url(#arr3)"/>
+            <path d="M192 150 C 240 150 240 118 288 118" marker-end="url(#arr3)"/>
+            <path d="M192 150 C 240 150 240 184 288 184" marker-end="url(#arr3)"/>
+            <path d="M192 150 C 240 150 240 250 288 250" marker-end="url(#arr3)"/>
+          </g>
+          <g fill="#f6f1e7">
+            <rect x="296" y="30" width="180" height="44" rx="6" stroke="#d8cdb8"/>
+            <rect x="296" y="96" width="180" height="44" rx="6" stroke="#d8cdb8"/>
+            <rect x="296" y="162" width="180" height="44" rx="6" stroke="#d8cdb8"/>
+            <rect x="296" y="228" width="180" height="44" rx="6" stroke="#d8cdb8"/>
+          </g>
+          <text x="312" y="57" fill="#221e18">communication style</text>
+          <text x="312" y="123" fill="#221e18">approval patterns</text>
+          <text x="312" y="189" fill="#b5431c" font-weight="600">corrections ★</text>
+          <text x="312" y="255" fill="#221e18">stack &amp; tooling</text>
+          <text x="486" y="57" fill="#5c554a" font-size="10">×6 parallel</text>
+          <text x="486" y="255" fill="#5c554a" font-size="10">agents</text>
+
+          <!-- converge -->
+          <g stroke="#b5431c" stroke-width="1.8" fill="none">
+            <path d="M484 52 C 540 52 540 132 588 132" marker-end="url(#arr3)"/>
+            <path d="M484 118 C 540 118 540 146 588 146" marker-end="url(#arr3)"/>
+            <path d="M484 184 C 540 184 540 158 588 158" marker-end="url(#arr3)"/>
+            <path d="M484 250 C 540 250 540 172 588 172" marker-end="url(#arr3)"/>
+          </g>
+          <rect x="596" y="106" width="110" height="88" rx="8" fill="#efe7d7" stroke="#d8cdb8"/>
+          <text x="612" y="142" font-weight="600" fill="#221e18">≥3× rule</text>
+          <text x="612" y="162" fill="#5c554a" font-size="11">+ human</text>
+          <text x="612" y="178" fill="#5c554a" font-size="11">confirms</text>
+
+          <path d="M714 150 h36" stroke="#b5431c" stroke-width="1.8" fill="none" marker-end="url(#arr3)"/>
+          <rect x="758" y="112" width="88" height="76" rx="8" fill="#b5431c"/>
+          <text x="772" y="146" fill="#f6f1e7" font-weight="600" font-size="12">workflow</text>
+          <text x="772" y="164" fill="#f6f1e7" font-weight="600" font-size="12">.md v1</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption><b>fig. 3</b> — mining five weeks of transcripts; corrections were the richest ore</figcaption>
+    </figure>
+
+    <p>The corrections were gold. Four times in two weeks I'd told the agent the same thing when it updated a config file: <em>replace</em> the old entry, don't append a duplicate. More than once it claimed a fix that didn't survive a test in the running app. Twice it proposed a workaround when I had asked for a root cause. Each of those became one imperative line — <em>“Replace config entries atomically.” “Verify fixes in the running app before claiming fixed.” “Never offer a workaround when asked for RCA.”</em> — every rule traceable to an observed pattern, zero generic best practice. Version one: <strong>95 lines, five sections</strong>.</p>
+
+    <h3>Step 2 — Check it against the field</h3>
+    <p>Then the question this post opened with: is a 95-line always-on file actually good AX? I ran a deep-research pipeline over the public literature — five parallel search angles, 24 sources fetched, 104 claims extracted, the top 25 each judged by three independent skeptic agents told to <em>refute</em> the claim and to default to refuted when uncertain.</p>
+
+    <figure>
+      <div class="fig-frame">
+      <svg viewBox="0 0 860 260" role="img" aria-labelledby="fig4t">
+        <title id="fig4t">Research funnel: 24 sources, 104 claims, 25 verified candidates, 9 surviving claims, 8 synthesized findings</title>
+        <g font-size="12">
+          <!-- funnel bars, widths ∝ sqrt for visibility -->
+          <rect x="30"  y="30"  width="800" height="30" rx="4" fill="#d8cdb8"/>
+          <rect x="110" y="76"  width="640" height="30" rx="4" fill="#d97a52"/>
+          <rect x="270" y="122" width="320" height="30" rx="4" fill="#b5431c"/>
+          <rect x="335" y="168" width="190" height="30" rx="4" fill="#3e6b50"/>
+          <rect x="352" y="214" width="156" height="30" rx="4" fill="#221e18"/>
+          <text x="44"  y="50"  fill="#221e18">24 sources fetched · 5 search angles</text>
+          <text x="124" y="96"  fill="#221e18">104 falsifiable claims extracted</text>
+          <text x="284" y="142" fill="#f6f1e7">25 sent to verification</text>
+          <text x="349" y="188" fill="#f6f1e7">9 survived 3 skeptics</text>
+          <text x="366" y="234" fill="#f6f1e7">8 final findings</text>
+          <text x="700" y="142" fill="#5c554a" font-size="11">← 16 killed here</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption><b>fig. 4</b> — a 64% kill rate at verification: most of what the field repeats about itself doesn't hold up as stated</figcaption>
+    </figure>
+
+    <h3>Step 3 — Refactor with what survived</h3>
+    <p>The verdict on v1: good bones — short imperative rules, no prose, everything observed — but it violated P1 and P3. It was universal and always-on, while roughly half its lines only mattered inside specific repositories. Side-project sessions were paying, on every prompt, for the deploy rituals of repos they would never touch.</p>
+    <p>So it became an architecture instead of a file: a <strong>~55-line always-on core</strong> (communication rules, autonomy boundaries, the hard “never” rules) with repo-specific conventions pushed down into per-repo files that load only there — untracked local files for shared team repositories, so my personal workflow never lands in anyone else's context. Payloads became pointers (P2): domain facts moved to memory files and per-repo docs the agent can open on demand. And the file now carries its own maintenance rule (P6): <em>if an instruction here keeps getting ignored, shorten the file; fold durable lessons back in.</em></p>
+
+    <figure>
+      <div class="fig-frame">
+      <svg viewBox="0 0 860 320" role="img" aria-labelledby="fig5t">
+        <title id="fig5t">Before: one 95-line file loaded everywhere. After: a 55-line core plus per-repo files and skills loading only where relevant.</title>
+        <g font-size="12">
+          <text x="30" y="34" fill="#5c554a" letter-spacing="2" font-size="12">BEFORE</text>
+          <rect x="30" y="50" width="300" height="196" rx="8" fill="#f6f1e7" stroke="#b5431c" stroke-width="1.6"/>
+          <text x="50" y="82" font-weight="600" fill="#221e18">workflow.md · 95 lines</text>
+          <g fill="#5c554a" font-size="11">
+            <text x="50" y="110">communication + autonomy</text>
+            <text x="50" y="130">frontend repo conventions</text>
+            <text x="50" y="150">backend repo conventions</text>
+            <text x="50" y="170">edge-fleet runbook details</text>
+            <text x="50" y="190">domain facts · deploy rituals</text>
+          </g>
+          <text x="50" y="226" fill="#b5431c" font-size="11" font-weight="600">every session pays for all of it</text>
+
+          <text x="30" y="292" fill="#5c554a" font-size="11">side-project session? still carries the</text>
+          <text x="30" y="308" fill="#5c554a" font-size="11">edge-fleet runbook. dead weight.</text>
+
+          <!-- divider -->
+          <line x1="400" y1="40" x2="400" y2="300" stroke="#d8cdb8" stroke-dasharray="3 6"/>
+
+          <text x="450" y="34" fill="#5c554a" letter-spacing="2" font-size="12">AFTER</text>
+          <rect x="450" y="50" width="380" height="64" rx="8" fill="#b5431c"/>
+          <text x="470" y="76" fill="#f6f1e7" font-weight="600">core · 55 lines · always on</text>
+          <text x="470" y="96" fill="#f6f1e7" font-size="11">how I communicate · autonomy · hard rules · pointers</text>
+          <g fill="#f6f1e7">
+            <rect x="450" y="132" width="182" height="56" rx="6" stroke="#d8cdb8"/>
+            <rect x="648" y="132" width="182" height="56" rx="6" stroke="#d8cdb8"/>
+            <rect x="450" y="204" width="182" height="56" rx="6" stroke="#d8cdb8"/>
+            <rect x="648" y="204" width="182" height="56" rx="6" stroke="#d8cdb8"/>
+          </g>
+          <g fill="#221e18" font-size="11">
+            <text x="466" y="156">frontend repo file</text>
+            <text x="664" y="156">backend repo file</text>
+            <text x="466" y="228">edge repo file</text>
+            <text x="664" y="228">solo-project file</text>
+          </g>
+          <g fill="#5c554a" font-size="10">
+            <text x="466" y="174">loads in that repo only</text>
+            <text x="664" y="174">loads in that repo only</text>
+            <text x="466" y="246">untracked · personal</text>
+            <text x="664" y="246">+ deploy via a skill</text>
+          </g>
+          <text x="450" y="296" fill="#3e6b50" font-size="11" font-weight="600">each session carries only what it can use — nearest file wins</text>
+        </g>
+      </svg>
+      </div>
+      <figcaption><b>fig. 5</b> — the refactor: same knowledge, ~40% lighter on every session, stronger where it applies</figcaption>
+    </figure>
+
+    <p>The loop closes neatly: transcripts taught the file what to say; AX research taught it where to live. Both halves came from evidence, and the file now improves the very sessions that will generate the next round of evidence.</p>
+  </div>
+</section>
+
+<!-- ══════════════ 07 ══════════════ -->
+<section id="diy">
+  <div class="noted">
+    <div>
+      <div class="kicker"><span class="num">07</span><h2>Do this yourself in an afternoon</h2></div>
+      <ol class="check">
+        <li><strong>Mine your own transcripts.</strong> Most agent CLIs keep session logs on disk (Claude Code: <code>~/.claude/projects/</code>). Have the agent read a month of them and extract repeated signals — especially every correction you made. Require 3+ occurrences before anything becomes a rule.</li>
+        <li><strong>Write the core file from evidence only.</strong> Short imperative rules, each traceable to an observed pattern. If you're inventing a rule the transcripts don't support, leave it out.</li>
+        <li><strong>Split by scope.</strong> Universal behavior in the always-on core; repo conventions in per-repo files; rituals with steps in skills/commands that load on demand. Use untracked local files for personal rules in shared repos.</li>
+        <li><strong>Convert payloads to pointers.</strong> Any pasted content the agent could fetch — replace with a path and one line of intent.</li>
+        <li><strong>Adopt the deletion reflex.</strong> Ignored rule → shorten the file. Ruthlessly.</li>
+        <li><strong>Close the loop.</strong> When a session goes unusually well or badly, fold the reason back into the file. It's source code for your working relationship — version it like source.</li>
+      </ol>
+      <p>The whole thing — mining, confirmation, writing, research, refactor — took one evening of wall-clock time, with the agent doing the reading. The result is a file that makes every future session start warmer than the last. That's Agent Experience in one sentence: <strong>design for the teammate who forgets everything, and you end up with documentation, boundaries, and feedback loops that would have made your human team better anyway.</strong></p>
+    </div>
+    <aside class="note"><b>meta</b><br>This page was itself produced in a Claude Code session steered by the workflow.md it describes. The loop is real.</aside>
+  </div>
+</section>
+
+<!-- ══════════════ sources ══════════════ -->
+<section id="sources" class="sources">
+  <div class="col">
+    <div class="kicker"><span class="num">∞</span><h2>Sources</h2></div>
+    <ol>
+      <li id="s1">Mathias Biilmann — <a href="https://biilmann.blog/articles/introducing-ax/" rel="noopener">Introducing AX: Why Agent Experience Matters</a>, Jan 28, 2025</li>
+      <li id="s2"><a href="https://agentexperience.ax/" rel="noopener">agentexperience.ax</a> — community definition &amp; resources</li>
+      <li id="s3">Anthropic — <a href="https://code.claude.com/docs/en/best-practices" rel="noopener">Claude Code best practices</a></li>
+      <li id="s4">Chroma Research — <a href="https://research.trychroma.com/context-rot" rel="noopener">Context Rot: How Increasing Input Tokens Impacts LLM Performance</a>, Jul 2025</li>
+      <li id="s5">Anthropic Engineering — <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents" rel="noopener">Effective context engineering for AI agents</a>, Sep 2025</li>
+      <li id="s6">OpenAI — <a href="https://developers.openai.com/codex/guides/agents-md" rel="noopener">Codex: AGENTS.md guide</a></li>
+      <li id="s7">Cursor — <a href="https://cursor.com/docs/rules" rel="noopener">Rules documentation</a></li>
+      <li id="s8">Sean Grove — <a href="https://www.youtube.com/watch?v=8rABwKRsec4" rel="noopener">“The New Code”</a>, AI Engineer World's Fair 2025</li>
+    </ol>
+    <p style="font-size:1rem;color:var(--ink-soft);margin-top:1.6rem"><em>Method note:</em> claims from these sources were verified by three independent skeptic agents each, instructed to refute and to default to “refuted” when uncertain. Only claims surviving at least 2 of 3 votes are presented as findings above; “corroboration-grade” marks numbers that appeared in verifier evidence but weren't independently confirmed.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>© 2026 Ashish Jain · set in Fraunces, Newsreader &amp; IBM Plex Mono</span>
+  <span><a href="https://github.com/Ashishjain608/agent-experience" rel="noopener">source on GitHub</a></span>
+</footer>
+
+</div>
+</body>
+</html>
